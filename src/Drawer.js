@@ -1,3 +1,4 @@
+//dibujar rectangulo en el canvas
 var drawRect = function(screen, body) {
   screen.fillRect(body.center.x - body.size.x / 2,
                   body.center.y - body.size.y / 2,

@@ -1,14 +1,17 @@
 import Ball from './Ball';
 import Player from './Player';
 
+//teclas para mover paletas
 const KEYS = {UP: 38, DOWN: 40, A: 65, Z: 90};
 
 let Game = function() {
+  //tamanho del tablero
   this.size = {
     width: 800,
     height: 600
   };
 
+  //objetos del juego (jugadores y pelotas)
   this.bodies = [
     new Ball(this),
     new Player(this, {x: 15, y: this.size.height / 2},
@@ -17,30 +20,37 @@ let Game = function() {
                {up: KEYS.UP, down: KEYS.DOWN})
   ];
 
+  //obtener el canvas del DOM
   let canvas = document.getElementById('canvas');
   canvas.width = this.size.width;
   canvas.height = this.size.height;
 
+  //Obtener el contexto para dibujar
   let screen = canvas.getContext('2d');
 
+  //bucle infinito para dibujar
   let tick = () => {
     this.update();
     this.draw(screen);
+    //dibujar aprox un frame cada 1/60 sg
     requestAnimationFrame(tick);
   };
+
   tick();
 };
 
 Game.prototype = {
   update() {
-    reportCollisions(this.bodies);
+    //actualizar cada objeto
     for (let i = 0, len = this.bodies.length; i < len; i++) {
       this.bodies[i].update();
     }
   },
 
   draw(screen) {
+    //limpiar canvas
     screen.clearRect(0, 0, this.size.width, this.size.height);
+    //dibujar cada objeto
     for (let i = 0, len = this.bodies.length; i < len; i++) {
       this.bodies[i].draw(screen);
     }

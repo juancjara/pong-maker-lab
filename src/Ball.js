@@ -1,5 +1,7 @@
 import Drawer from './Drawer';
 
+//crear "clase y constructor"
+
 let Ball = function(game) {
   this.game = game;
   this.center = {
@@ -16,8 +18,10 @@ let Ball = function(game) {
   };
 };
 
+//crear metodos de la clase
 Ball.prototype = {
-  checkOfLimits() {
+  //verificar si la pelota se sale del tablero
+  checkOffLimits() {
     let left = this.center.x - this.size.x / 2;
     let right = this.center.x + this.size.x / 2;
     let top = this.center.y - this.size.y / 2;
@@ -30,24 +34,29 @@ Ball.prototype = {
     }
   },
 
+  //rebote horizontal
   horizontalBounce() {
     this.speed.x *= -1;
   },
 
+  //rebote vertical
   verticalBounce() {
     this.speed.y *= -1;
   },
 
+  //esta funcion se llama en cada frame 
   update() {
-    this.checkOfLimits();
+    this.checkOffLimits();
     this.center.x += this.speed.x;
     this.center.y += this.speed.y;
   },
 
+  //dibujar esta figura
   draw(screen) {
     Drawer.drawRect(screen, this);
   },
 
+  //hacer cuando exita colision
   collision() {
     this.bounce();
   }

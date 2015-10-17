@@ -1,3 +1,5 @@
+//crear eventos para escuchar teclas y verificar si se presiona
+
 var Keyboarder = function() {
   var keyState = {};
 
@@ -12,8 +14,6 @@ var Keyboarder = function() {
   this.isDown = function(keyCode) {
     return keyState[keyCode] === true;
   };
-
-  this.KEYS = {UP: 38, DOWN: 40, A: 65, Z: 90};
 };
 
 export default Keyboarder;
