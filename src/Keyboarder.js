@@ -1,19 +1,22 @@
 //crear eventos para escuchar teclas y verificar si se presiona
 
-var Keyboarder = function() {
-  var keyState = {};
+let Keyboarder = {
+  keyState: {},
 
-  window.addEventListener('keydown', function(e) {
-    keyState[e.keyCode] = true;
-  });
+  initEvents() {
+    window.addEventListener('keydown', (e) => {
+      this.keyState[e.keyCode] = true;
+    });
 
-  window.addEventListener('keyup', function(e) {
-    keyState[e.keyCode] = false;
-  });
+    window.addEventListener('keyup', (e) => {
+      console.log('up')
+      this.keyState[e.keyCode] = false;
+    });
+  },
 
-  this.isDown = function(keyCode) {
-    return keyState[keyCode] === true;
-  };
+  isDown(keyCode) {
+    return this.keyState[keyCode] === true;
+  }
 };
 
 export default Keyboarder;
