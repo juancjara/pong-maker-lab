@@ -1,12 +1,15 @@
 let assert = require('assert');
 
-let utils = require('../src/utils');
+let utils = require('../static/src/utils');
 
 class A {
   constructor(center, size) {
     this.center = center;
     this.size = size;
   }
+
+
+
 };
 
 class B {
@@ -14,7 +17,6 @@ class B {
     this.center = center;
     this.size = size;
   }
-
   collision() {}
 };
 
@@ -27,7 +29,9 @@ let bodies = [
 describe('collisions', () => {
   it('report collisions', () => {
     var c = utils.reportCollisions(bodies);
-    assert.deepEqual(c, [bodies[1], bodies[0]]);
+    var expected = [];
+    expected.push([ bodies[1] , bodies[0] ]);
+    assert.deepEqual(c, expected);
   });
 });
 
