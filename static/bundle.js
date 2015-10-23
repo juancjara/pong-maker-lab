@@ -58,6 +58,13 @@ var Ball = (function () {
       this.speed.y *= -1;
     }
 
+    //rebote horizontal
+  }, {
+    key: 'horizontalBounce',
+    value: function horizontalBounce() {
+      this.speed.x *= -1;
+    }
+
     //esta funcion se llama en cada frame
   }, {
     key: 'update',
@@ -77,8 +84,8 @@ var Ball = (function () {
     //hacer cuando exita colision
   }, {
     key: 'collision',
-    value: function collision() {
-      this.bounce();
+    value: function collision(obj) {
+      this.horizontalBounce();
     }
   }]);
 
@@ -90,7 +97,70 @@ var Ball = (function () {
 exports['default'] = Ball;
 module.exports = exports['default'];
 
-},{"./Drawer":2}],2:[function(require,module,exports){
+},{"./Drawer":3}],2:[function(require,module,exports){
+'use strict';
+
+Object.defineProperty(exports, '__esModule', {
+  value: true
+});
+
+var _createClass = (function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ('value' in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; })();
+
+function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { 'default': obj }; }
+
+function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError('Cannot call a class as a function'); } }
+
+var _Drawer = require('./Drawer');
+
+var _Drawer2 = _interopRequireDefault(_Drawer);
+
+var Computer = (function () {
+  function Computer(game, center) {
+    _classCallCheck(this, Computer);
+
+    this.game = game;
+    this.center = center;
+    this.size = {
+      x: 10,
+      y: 100
+    };
+    this.speed = 2;
+  }
+
+  _createClass(Computer, [{
+    key: 'update',
+    value: function update() {}
+  }, {
+    key: 'draw',
+    value: function draw(screen) {
+      _Drawer2['default'].drawRect(screen, this);
+    }
+  }, {
+    key: 'moveUp',
+    value: function moveUp() {
+      this.center.y -= this.speed;
+    }
+  }, {
+    key: 'moveDown',
+    value: function moveDown() {
+      this.center.y += this.speed;
+    }
+  }, {
+    key: 'setCenter',
+    value: function setCenter(size) {
+      this.size = size;
+    }
+  }]);
+
+  return Computer;
+})();
+
+;
+
+exports['default'] = Computer;
+module.exports = exports['default'];
+
+},{"./Drawer":3}],3:[function(require,module,exports){
 //dibujar rectangulo en el canvas
 "use strict";
 
@@ -107,7 +177,7 @@ Drawer.drawRect = drawRect;
 exports["default"] = Drawer;
 module.exports = exports["default"];
 
-},{}],3:[function(require,module,exports){
+},{}],4:[function(require,module,exports){
 //crear eventos para escuchar teclas y verificar si se presiona
 
 'use strict';
@@ -126,7 +196,6 @@ var Keyboarder = {
     });
 
     window.addEventListener('keyup', function (e) {
-      console.log('up');
       _this.keyState[e.keyCode] = false;
     });
   },
@@ -139,7 +208,7 @@ var Keyboarder = {
 exports['default'] = Keyboarder;
 module.exports = exports['default'];
 
-},{}],4:[function(require,module,exports){
+},{}],5:[function(require,module,exports){
 'use strict';
 
 Object.defineProperty(exports, '__esModule', {
@@ -201,7 +270,7 @@ var Player = (function () {
 exports['default'] = Player;
 module.exports = exports['default'];
 
-},{"./Drawer":2,"./Keyboarder":3}],5:[function(require,module,exports){
+},{"./Drawer":3,"./Keyboarder":4}],6:[function(require,module,exports){
 'use strict';
 
 var _createClass = (function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ('value' in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; })();
@@ -222,6 +291,16 @@ var _Keyboarder = require('./Keyboarder');
 
 var _Keyboarder2 = _interopRequireDefault(_Keyboarder);
 
+var _utils = require('./utils');
+
+var _utils2 = _interopRequireDefault(_utils);
+
+var _Computer = require('./Computer');
+
+var _Computer2 = _interopRequireDefault(_Computer);
+
+var socket = io.connect('http://' + document.domain + ':' + location.port + '/test');
+
 //teclas para mover paletas
 var KEYS = { UP: 38, DOWN: 40, A: 65, Z: 90 };
 
@@ -238,8 +317,10 @@ var Game = (function () {
       height: 600
     };
 
+    this.computer = new _Computer2['default'](this, { x: 5, y: this.size.height / 2 });
+
     //objetos del juego (jugadores y pelotas)
-    this.bodies = [new _Ball2['default'](this), new _Player2['default'](this, { x: 5, y: this.size.height / 2 }, { up: KEYS.A, down: KEYS.Z }), new _Player2['default'](this, { x: this.size.width - 5, y: this.size.height / 2 }, { up: KEYS.UP, down: KEYS.DOWN })];
+    this.bodies = [new _Ball2['default'](this), this.computer, new _Player2['default'](this, { x: this.size.width - 5, y: this.size.height / 2 }, { up: KEYS.UP, down: KEYS.DOWN })];
 
     //obtener el canvas del DOM
     var canvas = document.getElementById('canvas');
@@ -270,7 +351,10 @@ var Game = (function () {
   }, {
     key: 'update',
     value: function update() {
-      reportCollisions(this.bodies);
+      var crashBodies = _utils2['default'].reportCollisions(this.bodies);
+      for (var i = 0, len = crashBodies.length; i < len; i++) {
+        crashBodies[i][0].collision(crashBodies[i][1]);
+      }
       //actualizar cada objeto
       for (var i = 0, len = this.bodies.length; i < len; i++) {
         this.bodies[i].update();
@@ -293,13 +377,39 @@ var Game = (function () {
 
 ;
 
+var game = new Game();
+
+socket.on('connect', function () {
+  console.log('connected');
+});
+
+socket.on('moveUp', function () {
+  game.computer.moveUp();
+});
+
+socket.on('moveDown', function () {
+  game.computer.moveDown();
+});
+
+socket.on('setCenter', function (newCenter) {
+  game.computer.setCenter(newCenter);
+});
+
+},{"./Ball":1,"./Computer":2,"./Keyboarder":4,"./Player":5,"./utils":7}],7:[function(require,module,exports){
+"use strict";
+
+Object.defineProperty(exports, "__esModule", {
+  value: true
+});
 var isColliding = function isColliding(b1, b2) {
   return !(b1 === b2 || b1.center.x + b1.size.x / 2 <= b2.center.x - b2.size.x / 2 || b1.center.y + b1.size.y / 2 <= b2.center.y - b2.size.y / 2 || b1.center.x - b1.size.x / 2 >= b2.center.x + b2.size.x / 2 || b1.center.y - b1.size.y / 2 >= b2.center.y + b2.size.y / 2);
 };
 
 var reportCollisions = function reportCollisions(bodies) {
+
   var bodyPairs = [];
-  var len = bodies.lenght;
+  var len = bodies.length;
+  var collisions = [];
 
   for (var i = 0; i < len; i++) {
     for (var j = i + 1; j < len; j++) {
@@ -309,17 +419,23 @@ var reportCollisions = function reportCollisions(bodies) {
     }
   }
 
+  len = bodyPairs.length;
   for (var i = 0; i < len; i++) {
     if (bodyPairs[i][0].collision !== undefined) {
-      bodyPairs[i][0].collision(bodyPairs[i][1]);
+      collisions.push([bodyPairs[i][0], bodyPairs[i][1]]);
     }
 
     if (bodyPairs[i][1].collision !== undefined) {
-      bodyPairs[i][1].collision(bodyPairs[i][0]);
+      collisions.push([bodyPairs[i][1], bodyPairs[i][0]]);
     }
   }
+
+  return collisions;
 };
 
-new Game();
+exports["default"] = {
+  reportCollisions: reportCollisions
+};
+module.exports = exports["default"];
 
-},{"./Ball":1,"./Keyboarder":3,"./Player":4}]},{},[5]);
+},{}]},{},[6]);

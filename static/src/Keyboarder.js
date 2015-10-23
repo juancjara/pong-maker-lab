@@ -9,7 +9,6 @@ let Keyboarder = {
     });
 
     window.addEventListener('keyup', (e) => {
-      console.log('up')
       this.keyState[e.keyCode] = false;
     });
   },

@@ -36,6 +36,11 @@ class Ball {
     this.speed.y *= -1;
   }
 
+  //rebote horizontal
+  horizontalBounce() {
+    this.speed.x *= -1;
+  }
+
   //esta funcion se llama en cada frame 
   update() {
     this.checkOffLimits();
@@ -49,8 +54,8 @@ class Ball {
   }
 
   //hacer cuando exita colision
-  collision() {
-    this.bounce();
+  collision(obj) {
+    this.horizontalBounce();
   }
 };
 
