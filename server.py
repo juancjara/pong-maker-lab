@@ -11,7 +11,9 @@ thread = None
 
 
 def background_thread():
-    """Example of how to send server generated events to clients."""
+    #simular enviar eventos al cliente
+    #se puede enviar moveUp,moveDown,setCenter
+    #con setCenter se puede ubicar la paleta en la posicion deseada
     while True:
         time.sleep(0.5)
         socketio.emit('moveUp','', namespace='/test')
