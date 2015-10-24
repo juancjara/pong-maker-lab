@@ -33,8 +33,7 @@ def index():
 
 @socketio.on('connect', namespace='/test')
 def test_connect():
-    emit('msg', 1234)
-    print 123
+    print 'user connected'
 
 if __name__ == "__main__":
     socketio.run(app)

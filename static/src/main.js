@@ -73,6 +73,7 @@ class Game {
       this.bodies[i].draw(screen);
     }
   }
+
 };
 
 let game = new Game();
@@ -80,7 +81,6 @@ let game = new Game();
 socket.on('connect', () => {
   console.log('connected');
 });
-
 
 socket.on('moveUp', () => {
   game.computer.moveUp();

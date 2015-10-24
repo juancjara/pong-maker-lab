@@ -57,6 +57,7 @@ class Ball {
   collision(obj) {
     this.horizontalBounce();
   }
+
 };
 
 export default Ball;
