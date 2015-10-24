@@ -20,13 +20,16 @@ class Game {
     };
 
     this.computer = new Computer(this, {x: 5, y: this.size.height / 2});
+    this.player = new Player(this, {x: this.size.width - 5,
+                                    y: this.size.height / 2},
+                             {up: KEYS.UP, down: KEYS.DOWN});
+    this.ball = new Ball(this);
 
     //objetos del juego (jugadores y pelotas)
     this.bodies = [
-      new Ball(this),
+      this.ball,
       this.computer,
-      new Player(this, {x: this.size.width - 5, y: this.size.height / 2},
-                 {up: KEYS.UP, down: KEYS.DOWN})
+      this.player
     ];
 
     //obtener el canvas del DOM
@@ -74,9 +77,23 @@ class Game {
     }
   }
 
+  getState() {
+    return {
+      'ball': this.ball.serialize(),
+      'computer': this.computer.serialize(),
+      'player': this.player.serialize()
+    }
+  }
+
 };
 
 let game = new Game();
+
+//enviando estado del juego cada 1sg solo para demo
+setInterval(() => {
+  socket.emit('game state', game.getState());
+}, 1000);
+//
 
 socket.on('connect', () => {
   console.log('connected');
@@ -94,4 +111,7 @@ socket.on('setCenter', (newCenter) => {
   game.computer.setCenter(newCenter);
 });
 
+socket.on('getState', () => {
+  socket.emit('game state', game.getState());
+})
 

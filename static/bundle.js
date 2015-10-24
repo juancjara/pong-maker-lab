@@ -87,6 +87,15 @@ var Ball = (function () {
     value: function collision(obj) {
       this.horizontalBounce();
     }
+  }, {
+    key: 'serialize',
+    value: function serialize() {
+      return {
+        size: this.size,
+        center: this.center,
+        speed: this.speed
+      };
+    }
   }]);
 
   return Ball;
@@ -149,6 +158,15 @@ var Computer = (function () {
     key: 'setCenter',
     value: function setCenter(size) {
       this.size = size;
+    }
+  }, {
+    key: 'serialize',
+    value: function serialize() {
+      return {
+        size: this.size,
+        center: this.center,
+        speed: this.speed
+      };
     }
   }]);
 
@@ -260,6 +278,15 @@ var Player = (function () {
     value: function draw(screen) {
       _Drawer2['default'].drawRect(screen, this);
     }
+  }, {
+    key: 'serialize',
+    value: function serialize() {
+      return {
+        size: this.size,
+        speed: this.speed,
+        center: this.center
+      };
+    }
   }]);
 
   return Player;
@@ -318,9 +345,12 @@ var Game = (function () {
     };
 
     this.computer = new _Computer2['default'](this, { x: 5, y: this.size.height / 2 });
+    this.player = new _Player2['default'](this, { x: this.size.width - 5,
+      y: this.size.height / 2 }, { up: KEYS.UP, down: KEYS.DOWN });
+    this.ball = new _Ball2['default'](this);
 
     //objetos del juego (jugadores y pelotas)
-    this.bodies = [new _Ball2['default'](this), this.computer, new _Player2['default'](this, { x: this.size.width - 5, y: this.size.height / 2 }, { up: KEYS.UP, down: KEYS.DOWN })];
+    this.bodies = [this.ball, this.computer, this.player];
 
     //obtener el canvas del DOM
     var canvas = document.getElementById('canvas');
@@ -370,6 +400,15 @@ var Game = (function () {
         this.bodies[i].draw(screen);
       }
     }
+  }, {
+    key: 'getState',
+    value: function getState() {
+      return {
+        'ball': this.ball.serialize(),
+        'computer': this.computer.serialize(),
+        'player': this.player.serialize()
+      };
+    }
   }]);
 
   return Game;
@@ -378,6 +417,12 @@ var Game = (function () {
 ;
 
 var game = new Game();
+
+//enviando estado del juego cada 1sg solo para demo
+setInterval(function () {
+  socket.emit('game state', game.getState());
+}, 1000);
+//
 
 socket.on('connect', function () {
   console.log('connected');
@@ -393,6 +438,10 @@ socket.on('moveDown', function () {
 
 socket.on('setCenter', function (newCenter) {
   game.computer.setCenter(newCenter);
+});
+
+socket.on('getState', function () {
+  socket.emit('game state', game.getState());
 });
 
 },{"./Ball":1,"./Computer":2,"./Keyboarder":4,"./Player":5,"./utils":7}],7:[function(require,module,exports){

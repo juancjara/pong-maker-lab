@@ -27,6 +27,15 @@ class Player {
   draw(screen) {
     Drawer.drawRect(screen, this);
   }
+
+  serialize() {
+    return {
+      size: this.size,
+      speed: this.speed,
+      center: this.center
+    }
+  }
+
 };
 
 export default Player;

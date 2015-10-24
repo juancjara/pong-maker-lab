@@ -29,6 +29,15 @@ class Computer {
   setCenter(size) {
     this.size = size;
   }
+
+  serialize() {
+    return {
+      size: this.size,
+      center: this.center,
+      speed: this.speed
+    }
+  }
+
 };
 
 export default Computer;

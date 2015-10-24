@@ -35,5 +35,10 @@ def index():
 def test_connect():
     print 'user connected'
 
+@socketio.on('game state', namespace='/test')
+def gameState(data):
+    print 'game state'
+    print data
+
 if __name__ == "__main__":
     socketio.run(app)

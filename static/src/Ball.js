@@ -58,6 +58,14 @@ class Ball {
     this.horizontalBounce();
   }
 
+  serialize() {
+    return {
+      size: this.size,
+      center: this.center,
+      speed: this.speed
+    }
+  }
+
 };
 
 export default Ball;
